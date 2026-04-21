@@ -1,0 +1,46 @@
+version: "3"
+
+tasks:
+  create-image:
+    - podman pull mysql
+    - |
+      podman run -d \
+        --replace \
+        --security-opt label=disable \
+        --name mysql_container \
+        -e MYSQL_ROOT_PASSWORD=rootpass \
+        -e MYSQL_DATABASE=mydb \
+        -e MYSQL_USER=dbuser \
+        -e MYSQL_PASSWORD=dbuser \
+        -p 3360:3360 \
+        -v mysql_data:/transfer/mysql \
+        mysql:latest
+
+  start:
+    cmds:
+      - podman start mysql_container
+
+  stop:
+    cmds:
+      - podman stop mysql_container
+
+  shell:
+    cmds:
+      - podman exec -it mysql_container bash
+
+  create-db:
+    cmds:
+      - podman exec -i mysql_container mysql -uroot -prootpass < CreateDB.sql
+
+  root-login:
+    cmds:
+      - podman exec -it mysql_container mysql -u root -p
+
+  user-login:
+    cmds:
+      - podman exec -it mysql_container mysql -u dbuser -p
+      
+  clean-all :
+    cmds:
+      - podman stop mysql_container
+      - podman rm mysql_container
