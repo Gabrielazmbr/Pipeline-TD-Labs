@@ -1,0 +1,4 @@
+# this file should only be used for the DCC tools via
+# mayapy -m pip install -r requirements.txt or similar with hython
+
+pymongo >=4.5
